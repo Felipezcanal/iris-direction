@@ -55,7 +55,12 @@ def detectCircles(image ,colored_image, minDist, dp):
 	blur = cv2.medianBlur(i_image,5)
 	# canny = cv2.Canny(blur, cannymin, cannymax)
 	circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, dp/10000, minDist, param1=cannymin, param2=cannymax, minRadius=radiusmin, maxRadius=radiusmax)
+
+
+	newImgName = "dest3/image"+'{:03d}'.format(globalcount)+".jpg"
+	globalcount += 1
 	if circles is None:
+		cv2.imwrite(newImgName, i_colored_images)
 		pprint('nada')
 		return
 	circles = np.uint16(np.around(circles))
@@ -80,9 +85,14 @@ def detectCircles(image ,colored_image, minDist, dp):
 	cv2.imshow('coins', i_colored_images)
 	# cv2.imshow('blur', blur)
 	cv2.waitKey(10)
-	newImgName = "dest/image"+'{:03d}'.format(globalcount)+".jpg"
 	cv2.imwrite(newImgName, i_colored_images)
-	globalcount += 1
+
+def resize(image, x):
+	h, w, _ = image.shape
+	y = round(w / (h/x))
+	if(y % 2 != 0):
+		y += 1
+	return cv2.resize(image, (y, x))
 
 def handleVideo():
 	global frame, gray, video_capture
@@ -101,10 +111,7 @@ def handleVideo():
 		# Capture frame-by-frame
 		ret, frame = video_capture.read()
 
-		h, w, c = frame.shape
-		x = 500
-		y = w / (h/x)
-		frame = cv2.resize(frame, (round(y), x))
+		frame = resize(frame, 500)
 
 		pprint('dentro')
 
